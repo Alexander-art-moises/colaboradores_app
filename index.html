@@ -113,6 +113,79 @@ body {
 }
 
 /* ══════════════════════════════
+   PANTALLA TARJETA PARE
+══════════════════════════════ */
+#pantalla-pare {
+  display: none;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #C0392B;
+  padding: 32px 24px;
+  gap: 20px;
+}
+
+.pare-imagen {
+  width: 85%;
+  max-width: 280px;
+}
+
+.pare-titulo {
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pare-lista {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pare-item {
+  background: rgba(0,0,0,0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pare-item::before {
+  content: "⚠";
+  font-size: 16px;
+}
+
+.btn-pare-continuar {
+  width: 100%;
+  max-width: 320px;
+  padding: 14px;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: 2px solid white;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-align: center;
+  margin-top: 4px;
+}
+.btn-pare-continuar:hover { background: rgba(255,255,255,0.3); }
+
+/* ══════════════════════════════
    PANTALLA LISTA COLABORADORES
 ══════════════════════════════ */
 #pantalla-lista {
@@ -172,6 +245,7 @@ body {
 .lista-nombre { font-size: 13px; font-weight: bold; color: #1f3055;
                 white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lista-cargo  { font-size: 11px; color: #888; margin-top: 2px; }
+.pare-badge { width: 36px; height: 36px; flex-shrink: 0; }
 
 #pantalla-perfil { display: none; max-width: 420px; margin: 0 auto; padding-bottom: 0; }
 
@@ -364,6 +438,18 @@ body {
   </div>
 </div>
 
+<!-- PANTALLA TARJETA PARE -->
+<div id="pantalla-pare">
+  <img class="pare-imagen"
+       src="https://raw.githubusercontent.com/Alexander-art-moises/operadores_app/main/TARJETA_PARE.png"
+       alt="Tarjeta PARE">
+  <p class="pare-titulo">Certificados pendientes o vencidos</p>
+  <div class="pare-lista" id="pare-lista"></div>
+  <button class="btn-pare-continuar" onclick="continuarAlPerfil()">
+    ENTENDIDO — VER MI PERFIL
+  </button>
+</div>
+
 <!-- PANTALLA LISTA -->
 <div id="pantalla-lista">
   <div class="lista-header">
@@ -422,11 +508,14 @@ const PIN_MAESTRO = "0000";
 const PIN_SUPER   = "2002";
 const PIN_ALEX    = "1008";
 const DNI_ALEX    = "75073340";
+const ROMBO_PARE  = "https://raw.githubusercontent.com/Alexander-art-moises/operadores_app/main/ROMBO_PARE_SUPER.png";
 
-let colaboradores = [];
-let riesgos       = [];
-let documentos    = [];
-let medico        = [];
+let colaboradores      = [];
+let riesgos            = [];
+let documentos         = [];
+let medico             = [];
+let certsRequeridos    = [];
+let dniPerfilPendiente = null;
 
 function sheetURL(hoja) {
   return `https://docs.google.com/spreadsheets/d/${SHEETS_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(hoja)}`;
@@ -464,11 +553,12 @@ function parseLine(line) {
 
 async function cargarDatos() {
   try {
-    [colaboradores, riesgos, documentos, medico] = await Promise.all([
+    [colaboradores, riesgos, documentos, medico, certsRequeridos] = await Promise.all([
       fetchCSV("1_Colaboradores"),
       fetchCSV("2_Riesgos"),
       fetchCSV("3_Documentos"),
       fetchCSV("4_Medico"),
+      fetchCSV("5_Certificados_Requeridos"),
     ]);
     document.getElementById("pantalla-carga").style.display = "none";
     document.getElementById("pantalla-pin").style.display   = "flex";
@@ -479,35 +569,49 @@ async function cargarDatos() {
 
 const dniLimpio = (d) => String(parseInt(d || "0"));
 
+/* Verifica si un colaborador tiene certificados faltantes o vencidos */
+function certificadosFaltantes(dni) {
+  const dniStr   = dniLimpio(dni);
+  const reqs     = certsRequeridos.filter(r => dniLimpio(r.DNI) === dniStr);
+
+  /* Si no hay certificados requeridos registrados → PARE */
+  if (reqs.length === 0) return ["Sin certificados registrados"];
+
+  const faltantes = [];
+  reqs.forEach(req => {
+    const cert = req.Certificado_Requerido || "";
+    /* Busca en documentos si tiene ese certificado VIGENTE */
+    const tieneVigente = documentos.some(d =>
+      dniLimpio(d.DNI) === dniStr &&
+      (d.Nombre || "").toLowerCase().includes(cert.toLowerCase()) &&
+      d.Estado === "VIGENTE"
+    );
+    if (!tieneVigente) faltantes.push(cert);
+  });
+
+  return faltantes;
+}
+
+/* Verifica si un colaborador tiene PARE para mostrar rombo en lista */
+function tienePare(dni) {
+  return certificadosFaltantes(dni).length > 0;
+}
+
 function verificarPin() {
   const pin   = document.getElementById("input-pin").value.trim();
   const error = document.getElementById("pin-error");
   error.style.display = "none";
 
-  /* PIN maestro — ve lista de todos */
-  if (pin === PIN_MAESTRO) {
-    mostrarLista(); return;
-  }
+  if (pin === PIN_MAESTRO) { mostrarLista(); return; }
+  if (pin === PIN_ALEX)    { mostrarPerfil(DNI_ALEX); return; }
+  if (pin === PIN_SUPER)   { mostrarLista(true); return; }
 
-  /* PIN Alexander — solo su perfil */
-  if (pin === PIN_ALEX) {
-    mostrarPerfil(DNI_ALEX); return;
-  }
-
-  /* PIN supervisión — ve lista de todos menos Alexander */
-  if (pin === PIN_SUPER) {
-    mostrarLista(true); return;
-  }
-
-  /* PIN colaborador — 4 primeros dígitos del DNI */
   const op = colaboradores.find(c => {
     const dni = dniLimpio(c.DNI);
     return dni.startsWith(pin) && pin.length === 4 && dni !== DNI_ALEX;
   });
 
-  if (op) {
-    mostrarPerfil(dniLimpio(op.DNI)); return;
-  }
+  if (op) { mostrarPerfil(dniLimpio(op.DNI)); return; }
 
   mostrarError("PIN incorrecto. Intenta nuevamente.");
 }
@@ -545,10 +649,11 @@ function renderLista(lista) {
   const el = document.getElementById("lista-items");
   el.innerHTML = "";
   lista.forEach(c => {
-    const dni      = dniLimpio(c.DNI);
-    const partes   = (c.Nombre || "").split(" ");
+    const dni       = dniLimpio(c.DNI);
+    const partes    = (c.Nombre || "").split(" ");
     const iniciales = (partes[1]?.[0] || "") + (partes[0]?.[0] || "");
-    const fotoURL  = c.Foto || "";
+    const fotoURL   = c.Foto || "";
+    const conPare   = tienePare(dni);
 
     const item = document.createElement("div");
     item.className = "lista-item";
@@ -565,21 +670,62 @@ function renderLista(lista) {
       }
     }
 
+    /* Rombo PARE al costado si le faltan certificados */
+    const romboHTML = conPare
+      ? `<img src="${ROMBO_PARE}" class="pare-badge" alt="PARE">`
+      : "";
+
     item.innerHTML = `
       ${avatarHTML}
       <div class="lista-info">
         <div class="lista-nombre">${c.Nombre || ""}</div>
         <div class="lista-cargo">${c.Cargo || ""}</div>
       </div>
+      ${romboHTML}
     `;
     el.appendChild(item);
   });
 }
 
 /* ══════════════════════════════════════════════
-   MOSTRAR PERFIL
+   MOSTRAR PERFIL — con verificación PARE
 ══════════════════════════════════════════════ */
 function mostrarPerfil(dni) {
+  const faltantes = certificadosFaltantes(dni);
+
+  /* Si hay faltantes y NO es supervisión → mostrar tarjeta PARE */
+  if (faltantes.length > 0) {
+    dniPerfilPendiente = dni;
+
+    const listaEl = document.getElementById("pare-lista");
+    listaEl.innerHTML = "";
+    faltantes.forEach(cert => {
+      const item = document.createElement("div");
+      item.className   = "pare-item";
+      item.textContent = cert;
+      listaEl.appendChild(item);
+    });
+
+    document.getElementById("pantalla-pin").style.display    = "none";
+    document.getElementById("pantalla-lista").style.display  = "none";
+    document.getElementById("pantalla-pare").style.display   = "flex";
+    return;
+  }
+
+  cargarPerfil(dni);
+}
+
+/* Continuar al perfil desde la tarjeta PARE */
+function continuarAlPerfil() {
+  document.getElementById("pantalla-pare").style.display = "none";
+  if (dniPerfilPendiente) {
+    cargarPerfil(dniPerfilPendiente);
+    dniPerfilPendiente = null;
+  }
+}
+
+/* Carga y muestra el perfil */
+function cargarPerfil(dni) {
   const op = colaboradores.find(c => dniLimpio(c.DNI) === dniLimpio(dni));
   if (!op) { mostrarError("Operador no encontrado."); return; }
 
@@ -674,7 +820,6 @@ function mostrarPerfil(dni) {
   renderDocs("tab-certificaciones", docsOp.filter(d => d.Tipo === "Certificación"));
   renderMedico("tab-medico", medicoOp);
 
-  /* Resetear tabs */
   cambiarTab(0);
 
   document.getElementById("pantalla-pin").style.display    = "none";
