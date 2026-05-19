@@ -117,14 +117,15 @@ body {
 ══════════════════════════════ */
 #pantalla-pare {
   display: none;
-  min-height: 100vh;
-  width: 100%;
-  max-width: 420px;
-  margin: 0 auto;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 500;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #C0392B;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   padding: 32px 24px;
   gap: 20px;
 }
@@ -152,7 +153,7 @@ body {
 }
 
 .pare-item {
-  background: rgba(0,0,0,0.25);
+  background: #8B0000;
   border-radius: 10px;
   padding: 10px 14px;
   color: white;
@@ -172,9 +173,9 @@ body {
   width: 100%;
   max-width: 320px;
   padding: 14px;
-  background: rgba(255,255,255,0.2);
+  background: #1f3055;
   color: white;
-  border: 2px solid white;
+  border: none;
   border-radius: 14px;
   font-size: 14px;
   font-weight: bold;
@@ -183,7 +184,7 @@ body {
   text-align: center;
   margin-top: 4px;
 }
-.btn-pare-continuar:hover { background: rgba(255,255,255,0.3); }
+.btn-pare-continuar:hover { background: #264984; }
 
 /* ══════════════════════════════
    PANTALLA LISTA COLABORADORES
@@ -443,7 +444,6 @@ body {
   <img class="pare-imagen"
        src="https://raw.githubusercontent.com/Alexander-art-moises/operadores_app/main/TARJETA_PARE.png"
        alt="Tarjeta PARE">
-  <p class="pare-titulo">Certificados pendientes o vencidos</p>
   <div class="pare-lista" id="pare-lista"></div>
   <button class="btn-pare-continuar" onclick="continuarAlPerfil()">
     ENTENDIDO — VER MI PERFIL
@@ -706,10 +706,12 @@ function mostrarPerfil(dni) {
       listaEl.appendChild(item);
     });
 
-    document.getElementById("pantalla-pin").style.display    = "none";
-    document.getElementById("pantalla-lista").style.display  = "none";
-    document.getElementById("pantalla-pare").style.display   = "flex";
-    return;
+      document.getElementById("pantalla-pin").style.display    = "none";
+      document.getElementById("pantalla-lista").style.display  = "none";
+      cargarPerfil(dni);
+      document.getElementById("pantalla-perfil").style.display = "block";
+      document.getElementById("pantalla-pare").style.display   = "flex";
+      return;
   }
 
   cargarPerfil(dni);
@@ -718,10 +720,7 @@ function mostrarPerfil(dni) {
 /* Continuar al perfil desde la tarjeta PARE */
 function continuarAlPerfil() {
   document.getElementById("pantalla-pare").style.display = "none";
-  if (dniPerfilPendiente) {
-    cargarPerfil(dniPerfilPendiente);
-    dniPerfilPendiente = null;
-  }
+  dniPerfilPendiente = null;
 }
 
 /* Carga y muestra el perfil */
