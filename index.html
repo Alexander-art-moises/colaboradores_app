@@ -135,15 +135,6 @@ body {
   max-width: 280px;
 }
 
-.pare-titulo {
-  color: white;
-  font-size: 15px;
-  font-weight: bold;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
 .pare-lista {
   width: 100%;
   max-width: 320px;
@@ -562,6 +553,8 @@ async function cargarDatos() {
     ]);
     document.getElementById("pantalla-carga").style.display = "none";
     document.getElementById("pantalla-pin").style.display   = "flex";
+    /* Estado inicial del historial */
+    history.replaceState({ pantalla: "pin" }, "");
   } catch(e) {
     document.querySelector(".carga-texto").textContent = "Error al cargar. Verifica tu conexión.";
   }
@@ -569,18 +562,59 @@ async function cargarDatos() {
 
 const dniLimpio = (d) => String(parseInt(d || "0"));
 
-/* Verifica si un colaborador tiene certificados faltantes o vencidos */
-function certificadosFaltantes(dni) {
-  const dniStr   = dniLimpio(dni);
-  const reqs     = certsRequeridos.filter(r => dniLimpio(r.DNI) === dniStr);
+/* ══════════════════════════════════════════════
+   MANEJO BOTÓN ATRÁS ANDROID
+══════════════════════════════════════════════ */
+window.addEventListener("popstate", function(e) {
+  const pantalla = e.state?.pantalla;
 
-  /* Si no hay certificados requeridos registrados → PARE */
+  /* Si el visor PDF está abierto → cerrarlo */
+  if (document.getElementById("visor-pdf").style.display === "flex") {
+    cerrarPDF();
+    history.pushState({ pantalla: "perfil" }, "");
+    return;
+  }
+
+  /* Si la tarjeta PARE está visible → cerrarla y mostrar perfil */
+  if (document.getElementById("pantalla-pare").style.display === "flex") {
+    continuarAlPerfil();
+    return;
+  }
+
+  /* Si estamos en el perfil → volver a lista o PIN */
+  if (document.getElementById("pantalla-perfil").style.display === "block") {
+    document.getElementById("pantalla-perfil").style.display = "none";
+    if (listaFiltrada.length > 0) {
+      document.getElementById("pantalla-lista").style.display = "block";
+      history.pushState({ pantalla: "lista" }, "");
+    } else {
+      document.getElementById("pantalla-pin").style.display = "flex";
+      history.pushState({ pantalla: "pin" }, "");
+    }
+    return;
+  }
+
+  /* Si estamos en la lista → volver al PIN */
+  if (document.getElementById("pantalla-lista").style.display === "block") {
+    document.getElementById("pantalla-lista").style.display = "none";
+    document.getElementById("pantalla-pin").style.display   = "flex";
+    history.pushState({ pantalla: "pin" }, "");
+    return;
+  }
+});
+
+/* ══════════════════════════════════════════════
+   CERTIFICADOS FALTANTES
+══════════════════════════════════════════════ */
+function certificadosFaltantes(dni) {
+  const dniStr = dniLimpio(dni);
+  const reqs   = certsRequeridos.filter(r => dniLimpio(r.DNI) === dniStr);
+
   if (reqs.length === 0) return ["Sin certificados registrados"];
 
   const faltantes = [];
   reqs.forEach(req => {
     const cert = req.Certificado_Requerido || "";
-    /* Busca en documentos si tiene ese certificado VIGENTE */
     const tieneVigente = documentos.some(d =>
       dniLimpio(d.DNI) === dniStr &&
       (d.Nombre || "").toLowerCase().includes(cert.toLowerCase()) &&
@@ -592,11 +626,13 @@ function certificadosFaltantes(dni) {
   return faltantes;
 }
 
-/* Verifica si un colaborador tiene PARE para mostrar rombo en lista */
 function tienePare(dni) {
   return certificadosFaltantes(dni).length > 0;
 }
 
+/* ══════════════════════════════════════════════
+   VERIFICAR PIN
+══════════════════════════════════════════════ */
 function verificarPin() {
   const pin   = document.getElementById("input-pin").value.trim();
   const error = document.getElementById("pin-error");
@@ -637,6 +673,7 @@ function mostrarLista(ocultarAlex = false) {
   document.getElementById("pantalla-lista").style.display  = "block";
   document.getElementById("lista-search").value = "";
   renderLista(listaFiltrada);
+  history.pushState({ pantalla: "lista" }, "");
 }
 
 function filtrarLista() {
@@ -670,7 +707,6 @@ function renderLista(lista) {
       }
     }
 
-    /* Rombo PARE al costado si le faltan certificados */
     const romboHTML = conPare
       ? `<img src="${ROMBO_PARE}" class="pare-badge" alt="PARE">`
       : "";
@@ -693,7 +729,6 @@ function renderLista(lista) {
 function mostrarPerfil(dni) {
   const faltantes = certificadosFaltantes(dni);
 
-  /* Si hay faltantes y NO es supervisión → mostrar tarjeta PARE */
   if (faltantes.length > 0) {
     dniPerfilPendiente = dni;
 
@@ -706,12 +741,13 @@ function mostrarPerfil(dni) {
       listaEl.appendChild(item);
     });
 
-      document.getElementById("pantalla-pin").style.display    = "none";
-      document.getElementById("pantalla-lista").style.display  = "none";
-      cargarPerfil(dni);
-      document.getElementById("pantalla-perfil").style.display = "block";
-      document.getElementById("pantalla-pare").style.display   = "flex";
-      return;
+    document.getElementById("pantalla-pin").style.display    = "none";
+    document.getElementById("pantalla-lista").style.display  = "none";
+    cargarPerfil(dni);
+    document.getElementById("pantalla-perfil").style.display = "block";
+    document.getElementById("pantalla-pare").style.display   = "flex";
+    history.pushState({ pantalla: "pare" }, "");
+    return;
   }
 
   cargarPerfil(dni);
@@ -823,6 +859,7 @@ function cargarPerfil(dni) {
 
   document.getElementById("pantalla-pin").style.display    = "none";
   document.getElementById("pantalla-perfil").style.display = "block";
+  history.pushState({ pantalla: "perfil" }, "");
 }
 
 function renderDocs(contenedorId, docs) {
@@ -911,6 +948,7 @@ function abrirPDF(url, titulo) {
   document.getElementById("visor-titulo").textContent = titulo;
   document.getElementById("iframe-pdf").src           = url;
   document.getElementById("visor-pdf").style.display  = "flex";
+  history.pushState({ pantalla: "pdf" }, "");
 }
 
 function cerrarPDF() {
