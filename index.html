@@ -4,379 +4,208 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Volcán · Planta Óxidos</title>
+<title>Sistema 360° · Planta Óxidos</title>
 
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: Arial, sans-serif;
-  background: #202b3d;
-  min-height: 100vh;
-}
+body { font-family: Arial, sans-serif; background: #202b3d; min-height: 100vh; }
 
 #pantalla-carga {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #1f3055;
-  gap: 20px;
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: #1f3055; gap: 20px;
 }
 .spinner {
   width: 48px; height: 48px;
   border: 5px solid rgba(255,255,255,0.2);
-  border-top-color: #ff7300;
-  border-radius: 50%;
+  border-top-color: #ff7300; border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 .carga-texto { color: rgba(255,255,255,0.7); font-size: 14px; }
 
-/* ══════════════════════════════
-   PANTALLA PIN — MÓVIL
-══════════════════════════════ */
 #pantalla-pin {
-  min-height: 100vh;
-  width: 100%;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  padding-bottom: 20%;
+  min-height: 100vh; width: 100%; display: none;
+  flex-direction: column; align-items: center;
+  justify-content: flex-end; padding-bottom: 20%;
   background-image: url('https://raw.githubusercontent.com/Alexander-art-moises/operadores_app/main/FONDO%20DE%20FONDOS.png');
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
+  background-size: cover; background-position: center top; background-repeat: no-repeat;
 }
-
-/* ══════════════════════════════
-   PANTALLA PIN — PC
-══════════════════════════════ */
 @media (min-width: 768px) {
   #pantalla-pin {
     background-image: url('https://raw.githubusercontent.com/Alexander-art-moises/colaboradores_app/main/PARA_PC.png');
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    justify-content: center;
-    padding-bottom: 0;
-    min-height: 100vh;
-    width: 100%;
+    background-size: cover; background-position: center center;
+    justify-content: center; padding-bottom: 0;
   }
-  .pin-card {
-    max-width: 380px;
-  }
-  .pin-frase {
-    display: none;
-  }
+  .pin-card { max-width: 380px; }
+  .pin-frase { display: none; }
 }
-
 .pin-card {
-  width: 80%;
-  max-width: 300px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
+  width: 80%; max-width: 300px; display: flex;
+  flex-direction: column; align-items: center; gap: 14px;
 }
-
 .pin-input {
-  width: 100%;
-  padding: 5px;
-  font-size: 28px;
-  text-align: center;
-  letter-spacing: 12px;
-  border: 2px solid #ff8a00;
-  border-radius: 14px;
-  outline: none;
-  color: #ff8a00;
-  background: rgba(255, 255, 255, 0.88);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 2px 12px rgba(31,78,121,0.10);
+  width: 100%; padding: 5px; font-size: 28px; text-align: center;
+  letter-spacing: 12px; border: 2px solid #ff8a00; border-radius: 14px;
+  outline: none; color: #ff8a00; background: rgba(255,255,255,0.88);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
 }
 .pin-input:focus { border-color: #ff8a00; background: rgba(255,255,255,0.97); }
 .pin-input::placeholder { color: #ff8a00; opacity: 1; }
-
 .btn-entrar {
-  width: 100%;
-  padding: 15px;
-  background: #1F4E79;
-  color: white;
-  border: none;
-  border-radius: 14px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  letter-spacing: 2px;
-  box-shadow: 0 4px 14px rgba(31,78,121,0.25);
+  width: 100%; padding: 15px; background: #1F4E79; color: white;
+  border: none; border-radius: 14px; font-size: 16px; font-weight: bold;
+  cursor: pointer; letter-spacing: 2px;
 }
 .btn-entrar:hover { background: #2E75B6; }
-.btn-entrar:active { transform: scale(0.98); }
-
 .pin-error {
-  color: #fff;
-  background: rgba(192,0,0,0.80);
-  padding: 7px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  text-align: center;
-  display: none;
-  width: 100%;
+  color: #fff; background: rgba(192,0,0,0.80); padding: 7px 16px;
+  border-radius: 8px; font-size: 13px; text-align: center; display: none; width: 100%;
 }
 .pin-frase {
-  color: white;
-  font-size: 20px;
-  font-style: italic;
-  font-weight: bold;
-  text-align: center;
-  line-height: 1.6;
-  margin-top: 6px;
+  color: white; font-size: 20px; font-style: italic; font-weight: bold;
+  text-align: center; line-height: 1.6; margin-top: 6px;
   text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
 }
 
-/* ══════════════════════════════
-   PANTALLA TARJETA PARE
-══════════════════════════════ */
 #pantalla-pare {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  z-index: 500;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 32px 24px;
-  gap: 20px;
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 500; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px); padding: 32px 24px; gap: 20px;
 }
-
-.pare-imagen {
-  width: 85%;
-  max-width: 280px;
-}
-
-.pare-lista {
-  width: 100%;
-  max-width: 320px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
+.pare-imagen { width: 85%; max-width: 280px; }
+.pare-lista { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 8px; }
 .pare-item {
-  background: #8B0000;
-  border-radius: 10px;
-  padding: 10px 14px;
-  color: white;
-  font-size: 13px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  background: #8B0000; border-radius: 10px; padding: 10px 14px;
+  color: white; font-size: 13px; font-weight: bold;
+  display: flex; align-items: center; gap: 8px;
 }
 .pare-item::before { content: "⚠"; font-size: 16px; }
-
 .btn-pare-continuar {
-  width: 100%;
-  max-width: 320px;
-  padding: 14px;
-  background: #1f3055;
-  color: white;
-  border: none;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  letter-spacing: 1px;
-  text-align: center;
-  margin-top: 4px;
+  width: 100%; max-width: 320px; padding: 14px; background: #1f3055; color: white;
+  border: none; border-radius: 14px; font-size: 14px; font-weight: bold;
+  cursor: pointer; letter-spacing: 1px; text-align: center; margin-top: 4px;
 }
 .btn-pare-continuar:hover { background: #264984; }
 
-/* ══════════════════════════════
-   PANTALLA LISTA COLABORADORES
-══════════════════════════════ */
-#pantalla-lista {
-  display: none;
-  max-width: 420px;
-  margin: 0 auto;
-  padding-bottom: 32px;
-}
+#pantalla-lista { display: none; max-width: 420px; margin: 0 auto; padding-bottom: 32px; }
 .lista-header {
-  background: #1f3055;
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  background: #1f3055; padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
 }
 .lista-header h2 { color: white; font-size: 16px; }
 .lista-buscar { padding: 12px 14px; background: #202b3d; }
 .lista-buscar input {
-  width: 100%;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 2px solid #354466;
-  background: #2a3650;
-  color: white;
-  font-size: 14px;
-  outline: none;
+  width: 100%; padding: 10px 14px; border-radius: 10px;
+  border: 2px solid #354466; background: #2a3650;
+  color: white; font-size: 14px; outline: none;
 }
 .lista-buscar input::placeholder { color: #8899bb; }
 .lista-buscar input:focus { border-color: #ff7300; }
 .lista-items { padding: 0 14px; }
 .lista-item {
-  background: white;
-  border-radius: 10px;
-  padding: 12px 14px;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  border: 1px solid #e0e0e0;
+  background: white; border-radius: 10px; padding: 12px 14px;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 12px;
+  cursor: pointer; border: 1px solid #e0e0e0;
 }
 .lista-item:hover { background: #f0f4ff; border-color: #c5d3ea; }
 .lista-avatar {
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  background: #264984;
-  border: 2px solid #ff7300;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: bold; color: white;
-  flex-shrink: 0; overflow: hidden;
+  width: 44px; height: 44px; border-radius: 50%; background: #264984;
+  border: 2px solid #ff7300; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: bold; color: white; flex-shrink: 0; overflow: hidden;
 }
 .lista-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .lista-info { flex: 1; min-width: 0; }
-.lista-nombre { font-size: 13px; font-weight: bold; color: #1f3055;
-                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lista-nombre { font-size: 13px; font-weight: bold; color: #1f3055; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lista-cargo  { font-size: 11px; color: #888; margin-top: 2px; }
-.pare-badge { width: 36px; height: 36px; flex-shrink: 0; }
+.pare-badge   { width: 36px; height: 36px; flex-shrink: 0; }
 
-/* ══════════════════════════════
-   PANTALLA PERFIL
-══════════════════════════════ */
 #pantalla-perfil { display: none; max-width: 420px; margin: 0 auto; padding-bottom: 0; }
-
 .header-band {
-  background: #1f3055;
-  padding: 20px 20px 24px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  background: #1f3055; padding: 20px 20px 24px;
+  display: flex; align-items: center; gap: 16px;
 }
 .avatar {
-  width: 64px; height: 64px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #ff7300;
-  background: #264984;
-  flex-shrink: 0;
+  width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
+  border: 3px solid #ff7300; background: #264984; flex-shrink: 0;
 }
 .avatar-fallback {
-  width: 64px; height: 64px;
-  border-radius: 50%;
-  background: #264984;
-  border: 3px solid #ff7300;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; font-weight: bold; color: white;
-  flex-shrink: 0;
+  width: 64px; height: 64px; border-radius: 50%; background: #264984;
+  border: 3px solid #ff7300; display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: bold; color: white; flex-shrink: 0;
 }
 .header-info { flex: 1; }
-.header-info h1  { font-size: 16px; font-weight: bold; color: #ffffff; margin-bottom: 3px; }
-.header-slogan   { font-size: 13px; color: #ff7300; margin-bottom: 2px; }
-.header-dni      { font-size: 11px; color: #ffffff; margin-top: 3px; }
+.header-info h1 { font-size: 16px; font-weight: bold; color: #ffffff; margin-bottom: 3px; }
+.header-slogan  { font-size: 13px; color: #ff7300; margin-bottom: 2px; }
+.header-dni     { font-size: 11px; color: #ffffff; margin-top: 3px; }
 
 .info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 14px;
-  background: #202b3d;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  padding: 14px; background: #202b3d;
 }
 .info-box {
-  background: white;
-  border-radius: 10px;
-  padding: 10px 12px;
-  border: 1px solid #c5d3ea;
+  background: white; border-radius: 10px; padding: 10px 12px; border: 1px solid #c5d3ea;
 }
 .info-box label { font-size: 11px; color: #888; display: block; margin-bottom: 2px; }
 .info-box span  { font-size: 13px; font-weight: bold; color: #1f3055; }
 .btn-mapa {
-  background: #1f3055; color: white;
-  border: none; border-radius: 8px;
-  padding: 6px 12px; font-size: 12px;
-  font-weight: bold; cursor: pointer;
+  background: #1f3055; color: white; border: none; border-radius: 8px;
+  padding: 6px 12px; font-size: 12px; font-weight: bold; cursor: pointer;
   width: 100%; text-align: left; margin-top: 2px;
 }
 .btn-mapa:hover { background: #264984; }
 .dropdown-mapa { display: none; flex-direction: column; gap: 4px; margin-top: 4px; }
 .dropdown-mapa.abierto { display: flex; }
 
+/* ══ BOTÓN REPORTE 360 ══ */
+.btn-reporte360 {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: calc(100% - 28px); margin: 14px 14px 0;
+  padding: 14px 20px; background: #ff7300; color: white;
+  border: none; border-radius: 14px; font-size: 15px; font-weight: bold;
+  cursor: pointer; letter-spacing: 0.5px;
+  box-shadow: 0 4px 16px rgba(255,115,0,0.25);
+}
+.btn-reporte360:hover { background: #e06500; }
+.btn-reporte360:active { transform: scale(0.98); }
+.btn-reporte360-icon { font-size: 20px; }
+
 .seccion { padding: 0 14px 6px; }
 .seccion-titulo {
   font-size: 11px; font-weight: bold; color: #ff7300;
   text-transform: uppercase; letter-spacing: 0.05em;
-  padding: 14px 0 8px;
-  border-bottom: 1px solid #ffe0c0;
-  margin-bottom: 10px;
+  padding: 14px 0 8px; border-bottom: 1px solid #ffe0c0; margin-bottom: 10px;
 }
-
 .riesgos-wrap { display: flex; flex-direction: column; gap: 6px; }
 .riesgo-tag {
-  background: #fff8f0;
-  color: #cc5e00;
-  font-size: 12px;
-  padding: 5px 11px;
-  border-radius: 20px;
-  border: 1.5px solid #ff7300;
-  font-weight: bold;
+  background: #fff8f0; color: #cc5e00; font-size: 12px;
+  padding: 5px 11px; border-radius: 20px; border: 1.5px solid #ff7300; font-weight: bold;
 }
 
 .tabs {
-  display: flex;
-  background: white;
-  border-bottom: 2px solid #c5d3ea;
-  margin: 14px 0 0;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  display: flex; background: white; border-bottom: 2px solid #c5d3ea;
+  margin: 14px 0 0; position: sticky; top: 0; z-index: 10;
 }
 .tab {
-  flex: 1;
-  text-align: center;
-  padding: 11px 4px;
-  font-size: 12px;
-  color: #888;
-  cursor: pointer;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -2px;
-  font-weight: bold;
+  flex: 1; text-align: center; padding: 11px 4px; font-size: 12px;
+  color: #888; cursor: pointer; border-bottom: 3px solid transparent;
+  margin-bottom: -2px; font-weight: bold;
 }
 .tab.activa { color: #1f3055; border-bottom-color: #ff7300; }
 .tab-content { display: none; padding: 4px 14px 8px; background: #202b3d; }
 .tab-content.activa { display: block; }
 
 .doc-item {
-  background: white;
-  border-radius: 10px;
-  padding: 12px 14px;
-  margin-bottom: 8px;
-  border: 1px solid #e0e0e0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  background: white; border-radius: 10px; padding: 12px 14px;
+  margin-bottom: 8px; border: 1px solid #e0e0e0;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
 }
-.doc-info    { flex: 1; min-width: 0; }
-.doc-tipo    { font-size: 10px; color: #888; margin-bottom: 2px; text-transform: uppercase; }
-.doc-nombre  { font-size: 13px; font-weight: bold; color: #1f3055; margin-bottom: 3px;
-               white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.doc-fecha   { font-size: 11px; color: #888; }
+.doc-info   { flex: 1; min-width: 0; }
+.doc-tipo   { font-size: 10px; color: #888; margin-bottom: 2px; text-transform: uppercase; }
+.doc-nombre { font-size: 13px; font-weight: bold; color: #1f3055; margin-bottom: 3px;
+              white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.doc-fecha  { font-size: 11px; color: #888; }
 .doc-derecha { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
 
 .badge { font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
@@ -385,46 +214,31 @@ body {
 .badge-VENCIDO    { background: #FCE4D6; color: #833C00; border: 1px solid #F4B183; }
 
 .btn-pdf {
-  font-size: 11px;
-  color: #1f3055;
-  background: #e8eef8;
-  border: 1px solid #c5d3ea;
-  border-radius: 6px;
-  padding: 4px 10px;
-  cursor: pointer;
-  font-weight: bold;
+  font-size: 11px; color: #1f3055; background: #e8eef8;
+  border: 1px solid #c5d3ea; border-radius: 6px;
+  padding: 4px 10px; cursor: pointer; font-weight: bold;
 }
 .btn-pdf:hover { background: #c5d3ea; }
 
 #visor-pdf {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 1000;
-  flex-direction: column;
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7); z-index: 1000; flex-direction: column;
 }
 .visor-header {
-  background: #1f3055;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  background: #1f3055; padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
 }
 .visor-header span { color: white; font-size: 14px; font-weight: bold; }
 .btn-cerrar {
-  background: rgba(255,255,255,0.2);
-  color: white; border: none; border-radius: 6px;
-  padding: 6px 14px; font-size: 13px; cursor: pointer; font-weight: bold;
+  background: rgba(255,255,255,0.2); color: white; border: none;
+  border-radius: 6px; padding: 6px 14px; font-size: 13px; cursor: pointer; font-weight: bold;
 }
 #iframe-pdf { flex: 1; border: none; width: 100%; }
 
 .btn-salir {
-  display: block; width: 100%; margin: 0; padding: 13px;
+  display: block; width: 100%; margin: 14px 0 0; padding: 13px;
   background: #C00000; color: white; border: none;
-  border-top: 1px solid #ddd;
-  border-radius: 0; font-size: 13px; text-align: center;
-  cursor: pointer; font-weight: bold;
+  font-size: 13px; text-align: center; cursor: pointer; font-weight: bold;
 }
 .btn-salir:hover { background: #a00000; }
 .sin-datos { text-align: center; color: #aaa; font-size: 13px; padding: 20px 0; }
@@ -432,13 +246,11 @@ body {
 </head>
 <body>
 
-<!-- PANTALLA CARGA -->
 <div id="pantalla-carga">
   <div class="spinner"></div>
   <p class="carga-texto">Cargando datos...</p>
 </div>
 
-<!-- PANTALLA PIN -->
 <div id="pantalla-pin">
   <div class="pin-card">
     <input class="pin-input" type="password" id="input-pin"
@@ -450,18 +262,14 @@ body {
   </div>
 </div>
 
-<!-- PANTALLA TARJETA PARE -->
 <div id="pantalla-pare">
   <img class="pare-imagen"
        src="https://raw.githubusercontent.com/Alexander-art-moises/operadores_app/main/TARJETA_PARE.png"
        alt="Tarjeta PARE">
   <div class="pare-lista" id="pare-lista"></div>
-  <button class="btn-pare-continuar" onclick="continuarAlPerfil()">
-    ENTENDIDO — VER MI PERFIL
-  </button>
+  <button class="btn-pare-continuar" onclick="continuarAlPerfil()">ENTENDIDO — VER MI PERFIL</button>
 </div>
 
-<!-- PANTALLA LISTA -->
 <div id="pantalla-lista">
   <div class="lista-header">
     <h2>Selecciona un colaborador</h2>
@@ -473,7 +281,6 @@ body {
   <div class="lista-items" id="lista-items"></div>
 </div>
 
-<!-- PANTALLA PERFIL -->
 <div id="pantalla-perfil">
   <div class="header-band">
     <div id="avatar-container"></div>
@@ -489,22 +296,29 @@ body {
     <div class="info-box"><label>Puesto</label><span id="op-puesto"></span></div>
     <div class="info-box" id="box-mapa"><label>Mapa de Riesgos</label><div id="op-mapa"></div></div>
   </div>
+
+  <!-- ══ BOTÓN REPORTE 360 ══ -->
+  <button class="btn-reporte360" id="btn-reporte360" onclick="abrirReporte360()">
+    <span class="btn-reporte360-icon">📋</span>
+    Reporte 360°
+  </button>
+
   <div class="seccion">
     <div class="seccion-titulo">Riesgos críticos del área</div>
     <div class="riesgos-wrap" id="op-riesgos"></div>
   </div>
+
+  <!-- Solo 2 tabs ahora: Capacitaciones y Certificaciones -->
   <div class="tabs">
     <div class="tab activa" onclick="cambiarTab(0)">Capacitaciones</div>
     <div class="tab"        onclick="cambiarTab(1)">Certificaciones</div>
-    <div class="tab"        onclick="cambiarTab(2)">Exam. Médico</div>
   </div>
   <div class="tab-content activa" id="tab-capacitaciones"></div>
   <div class="tab-content"        id="tab-certificaciones"></div>
-  <div class="tab-content"        id="tab-medico"></div>
+
   <button class="btn-salir" onclick="cerrarSesion()">Cerrar sesión</button>
 </div>
 
-<!-- VISOR PDF -->
 <div id="visor-pdf">
   <div class="visor-header">
     <span id="visor-titulo">Documento</span>
@@ -520,24 +334,23 @@ const PIN_SUPER   = "2002";
 const PIN_ALEX    = "1008";
 const DNI_ALEX    = "75073340";
 const ROMBO_PARE  = "https://raw.githubusercontent.com/Alexander-art-moises/operadores_app/main/ROMBO_PARE_SUPER.png";
+const REPORTE360_URL = "https://reporte360.vercel.app";
 
 let colaboradores      = [];
 let riesgos            = [];
 let documentos         = [];
-let medico             = [];
 let certsRequeridos    = [];
 let dniPerfilPendiente = null;
+let dniActual          = null;   // DNI del perfil que se está viendo
 
 function sheetURL(hoja) {
   return `https://docs.google.com/spreadsheets/d/${SHEETS_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(hoja)}`;
 }
-
 async function fetchCSV(hoja) {
   const res  = await fetch(sheetURL(hoja));
   const text = await res.text();
   return parseCSV(text);
 }
-
 function parseCSV(text) {
   const lines   = text.trim().split("\n");
   const headers = parseLine(lines[0]);
@@ -548,7 +361,6 @@ function parseCSV(text) {
     return obj;
   });
 }
-
 function parseLine(line) {
   const result = [];
   let cur = "", inQ = false;
@@ -561,14 +373,14 @@ function parseLine(line) {
   result.push(cur);
   return result;
 }
+const dniLimpio = (d) => String(parseInt(d || "0"));
 
 async function cargarDatos() {
   try {
-    [colaboradores, riesgos, documentos, medico, certsRequeridos] = await Promise.all([
+    [colaboradores, riesgos, documentos, certsRequeridos] = await Promise.all([
       fetchCSV("1_Colaboradores"),
       fetchCSV("2_Riesgos"),
       fetchCSV("3_Documentos"),
-      fetchCSV("4_Medico"),
       fetchCSV("5_Certificados_Requeridos"),
     ]);
     document.getElementById("pantalla-carga").style.display = "none";
@@ -579,11 +391,14 @@ async function cargarDatos() {
   }
 }
 
-const dniLimpio = (d) => String(parseInt(d || "0"));
+/* ══ BOTÓN REPORTE 360° — abre en pestaña nueva pasando el DNI ══ */
+function abrirReporte360() {
+  if (!dniActual) return;
+  const url = `${REPORTE360_URL}?dni=${dniActual}`;
+  window.open(url, "_blank");
+}
 
-/* ══════════════════════════════════════════════
-   MANEJO BOTÓN ATRÁS ANDROID
-══════════════════════════════════════════════ */
+/* ══ BOTÓN ATRÁS ANDROID ══ */
 window.addEventListener("popstate", function(e) {
   if (document.getElementById("visor-pdf").style.display === "flex") {
     cerrarPDF();
@@ -591,8 +406,7 @@ window.addEventListener("popstate", function(e) {
     return;
   }
   if (document.getElementById("pantalla-pare").style.display === "flex") {
-    continuarAlPerfil();
-    return;
+    continuarAlPerfil(); return;
   }
   if (document.getElementById("pantalla-perfil").style.display === "block") {
     document.getElementById("pantalla-perfil").style.display = "none";
@@ -613,13 +427,11 @@ window.addEventListener("popstate", function(e) {
   }
 });
 
-/* ══════════════════════════════════════════════
-   CERTIFICADOS FALTANTES
-══════════════════════════════════════════════ */
+/* ══ CERTIFICADOS FALTANTES ══ */
 function certificadosFaltantes(dni) {
   const dniStr = dniLimpio(dni);
   const reqs   = certsRequeridos.filter(r => dniLimpio(r.DNI) === dniStr);
-  if (reqs.length === 0) return ["Sin certificados registrados"];
+  if (reqs.length === 0) return [];
   const faltantes = [];
   reqs.forEach(req => {
     const cert = req.Certificado_Requerido || "";
@@ -632,14 +444,9 @@ function certificadosFaltantes(dni) {
   });
   return faltantes;
 }
+function tienePare(dni) { return certificadosFaltantes(dni).length > 0; }
 
-function tienePare(dni) {
-  return certificadosFaltantes(dni).length > 0;
-}
-
-/* ══════════════════════════════════════════════
-   VERIFICAR PIN
-══════════════════════════════════════════════ */
+/* ══ PIN ══ */
 function verificarPin() {
   const pin   = document.getElementById("input-pin").value.trim();
   const error = document.getElementById("pin-error");
@@ -653,40 +460,29 @@ function verificarPin() {
     const dni = dniLimpio(c.DNI);
     return dni.startsWith(pin) && pin.length === 4 && dni !== DNI_ALEX;
   });
-
   if (op) { mostrarPerfil(dniLimpio(op.DNI)); return; }
-  mostrarError("PIN incorrecto. Intenta nuevamente.");
-}
-
-function mostrarError(msg) {
   const e = document.getElementById("pin-error");
-  e.textContent   = msg;
+  e.textContent = "PIN incorrecto. Intenta nuevamente.";
   e.style.display = "block";
   document.getElementById("input-pin").value = "";
 }
 
-/* ══════════════════════════════════════════════
-   LISTA DE COLABORADORES
-══════════════════════════════════════════════ */
+/* ══ LISTA ══ */
 let listaFiltrada = [];
-
 function mostrarLista(ocultarAlex = false) {
   listaFiltrada = ocultarAlex
     ? colaboradores.filter(c => dniLimpio(c.DNI) !== DNI_ALEX)
     : colaboradores;
-  document.getElementById("pantalla-pin").style.display    = "none";
-  document.getElementById("pantalla-lista").style.display  = "block";
+  document.getElementById("pantalla-pin").style.display   = "none";
+  document.getElementById("pantalla-lista").style.display = "block";
   document.getElementById("lista-search").value = "";
   renderLista(listaFiltrada);
   history.pushState({ pantalla: "lista" }, "");
 }
-
 function filtrarLista() {
   const q = document.getElementById("lista-search").value.toLowerCase();
-  const filtrados = listaFiltrada.filter(c => (c.Nombre || "").toLowerCase().includes(q));
-  renderLista(filtrados);
+  renderLista(listaFiltrada.filter(c => (c.Nombre || "").toLowerCase().includes(q)));
 }
-
 function renderLista(lista) {
   const el = document.getElementById("lista-items");
   el.innerHTML = "";
@@ -696,85 +492,72 @@ function renderLista(lista) {
     const iniciales = (partes[1]?.[0] || "") + (partes[0]?.[0] || "");
     const fotoURL   = c.Foto || "";
     const conPare   = tienePare(dni);
-
     const item = document.createElement("div");
     item.className = "lista-item";
     item.onclick   = () => {
       document.getElementById("pantalla-lista").style.display = "none";
       mostrarPerfil(dni);
     };
-
     let avatarHTML = `<div class="lista-avatar">${iniciales.toUpperCase()}</div>`;
     if (fotoURL.includes("drive.google.com")) {
       const match = fotoURL.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (match) {
-        avatarHTML = `<div class="lista-avatar"><img src="https://drive.google.com/thumbnail?id=${match[1]}&sz=w100" onerror="this.parentElement.innerHTML='${iniciales.toUpperCase()}'"></div>`;
-      }
+      if (match) avatarHTML = `<div class="lista-avatar"><img src="https://drive.google.com/thumbnail?id=${match[1]}&sz=w100" onerror="this.parentElement.innerHTML='${iniciales.toUpperCase()}'"></div>`;
     }
-
-    const romboHTML = conPare
-      ? `<img src="${ROMBO_PARE}" class="pare-badge" alt="PARE">`
-      : "";
-
     item.innerHTML = `
       ${avatarHTML}
       <div class="lista-info">
         <div class="lista-nombre">${c.Nombre || ""}</div>
         <div class="lista-cargo">${c.Cargo || ""}</div>
       </div>
-      ${romboHTML}
+      ${conPare ? `<img src="${ROMBO_PARE}" class="pare-badge" alt="PARE">` : ""}
     `;
     el.appendChild(item);
   });
 }
 
-/* ══════════════════════════════════════════════
-   MOSTRAR PERFIL
-══════════════════════════════════════════════ */
+/* ══ MOSTRAR PERFIL ══ */
 function mostrarPerfil(dni) {
   const faltantes = certificadosFaltantes(dni);
-
   if (faltantes.length > 0) {
     dniPerfilPendiente = dni;
     const listaEl = document.getElementById("pare-lista");
     listaEl.innerHTML = "";
     faltantes.forEach(cert => {
       const item = document.createElement("div");
-      item.className   = "pare-item";
-      item.textContent = cert;
+      item.className = "pare-item"; item.textContent = cert;
       listaEl.appendChild(item);
     });
-    document.getElementById("pantalla-pin").style.display    = "none";
-    document.getElementById("pantalla-lista").style.display  = "none";
+    document.getElementById("pantalla-pin").style.display   = "none";
+    document.getElementById("pantalla-lista").style.display = "none";
     cargarPerfil(dni);
     document.getElementById("pantalla-perfil").style.display = "block";
     document.getElementById("pantalla-pare").style.display   = "flex";
     history.pushState({ pantalla: "pare" }, "");
     return;
   }
-
   cargarPerfil(dni);
 }
-
 function continuarAlPerfil() {
   document.getElementById("pantalla-pare").style.display = "none";
   dniPerfilPendiente = null;
 }
 
+/* ══ CARGAR PERFIL ══ */
 function cargarPerfil(dni) {
   const op = colaboradores.find(c => dniLimpio(c.DNI) === dniLimpio(dni));
-  if (!op) { mostrarError("Operador no encontrado."); return; }
+  if (!op) return;
+
+  dniActual = dniLimpio(op.DNI);   // Guardamos para el botón Reporte 360
 
   const avatarContainer = document.getElementById("avatar-container");
   avatarContainer.innerHTML = "";
   const partes    = (op.Nombre || "").split(" ");
   const iniciales = (partes[1]?.[0] || "") + (partes[0]?.[0] || "");
   const fotoURL   = op.Foto || "";
-
   if (fotoURL.includes("drive.google.com")) {
     const match = fotoURL.match(/\/d\/([a-zA-Z0-9_-]+)/);
     if (match) {
-      const img     = document.createElement("img");
+      const img = document.createElement("img");
       img.className = "avatar";
       img.src       = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w400`;
       img.onerror   = () => { avatarContainer.innerHTML = `<div class="avatar-fallback">${iniciales.toUpperCase()}</div>`; };
@@ -792,67 +575,53 @@ function cargarPerfil(dni) {
   document.getElementById("op-area").textContent       = "Planta Óxidos";
 
   const areas = [op.Area1, op.Area2, op.Area3].filter(a => a && a.trim());
-
   const mapaLinks = [];
   areas.forEach(area => {
     const fila = riesgos.find(r => r.Area === area && r["Mapa de Riesgos"]);
     if (fila) mapaLinks.push({ area, url: fila["Mapa de Riesgos"] });
   });
-
   const mapaEl = document.getElementById("op-mapa");
   mapaEl.innerHTML = "";
-
   if (mapaLinks.length === 1) {
     const btn = document.createElement("button");
-    btn.className   = "btn-mapa";
-    btn.textContent = "Ver Mapa";
-    btn.onclick     = () => abrirPDF(drivePreview(mapaLinks[0].url), "Mapa de Riesgos");
+    btn.className = "btn-mapa"; btn.textContent = "Ver Mapa";
+    btn.onclick = () => abrirPDF(drivePreview(mapaLinks[0].url), "Mapa de Riesgos");
     mapaEl.appendChild(btn);
   } else if (mapaLinks.length > 1) {
-    const btnPrincipal = document.createElement("button");
-    btnPrincipal.className   = "btn-mapa";
-    btnPrincipal.textContent = "Ver Mapa ▼";
-    const dropdown = document.createElement("div");
-    dropdown.className = "dropdown-mapa";
+    const btnP = document.createElement("button");
+    btnP.className = "btn-mapa"; btnP.textContent = "Ver Mapa ▼";
+    const drop = document.createElement("div");
+    drop.className = "dropdown-mapa";
     mapaLinks.forEach(m => {
-      const btn2 = document.createElement("button");
-      btn2.className   = "btn-mapa";
-      btn2.textContent = m.area;
-      btn2.onclick     = () => abrirPDF(drivePreview(m.url), "Mapa de Riesgos - " + m.area);
-      dropdown.appendChild(btn2);
+      const b = document.createElement("button");
+      b.className = "btn-mapa"; b.textContent = m.area;
+      b.onclick = () => abrirPDF(drivePreview(m.url), "Mapa de Riesgos - " + m.area);
+      drop.appendChild(b);
     });
-    btnPrincipal.onclick = () => dropdown.classList.toggle("abierto");
-    mapaEl.appendChild(btnPrincipal);
-    mapaEl.appendChild(dropdown);
+    btnP.onclick = () => drop.classList.toggle("abierto");
+    mapaEl.appendChild(btnP); mapaEl.appendChild(drop);
   } else {
     mapaEl.innerHTML = '<span style="color:#aaa;font-size:11px;">Sin mapa asignado</span>';
   }
 
   const riesgosSet = new Set();
-  areas.forEach(area => {
-    riesgos.filter(r => r.Area === area).forEach(r => riesgosSet.add(r.Riesgo));
-  });
+  areas.forEach(area => riesgos.filter(r => r.Area === area).forEach(r => riesgosSet.add(r.Riesgo)));
   const riesgosEl = document.getElementById("op-riesgos");
   riesgosEl.innerHTML = "";
   if (riesgosSet.size === 0) {
     riesgosEl.innerHTML = '<span style="color:#aaa;font-size:12px;">Sin riesgos asignados</span>';
   } else {
     riesgosSet.forEach(r => {
-      const tag       = document.createElement("span");
-      tag.className   = "riesgo-tag";
-      tag.textContent = r;
+      const tag = document.createElement("span");
+      tag.className = "riesgo-tag"; tag.textContent = r;
       riesgosEl.appendChild(tag);
     });
   }
 
-  const dniStr   = dniLimpio(op.DNI);
-  const docsOp   = documentos.filter(d => dniLimpio(d.DNI) === dniStr && d.Tipo && d.Nombre);
-  const medicoOp = medico.filter(d => dniLimpio(d.DNI) === dniStr && d.Nombre);
-
+  const dniStr = dniLimpio(op.DNI);
+  const docsOp = documentos.filter(d => dniLimpio(d.DNI) === dniStr && d.Tipo && d.Nombre);
   renderDocs("tab-capacitaciones",  docsOp.filter(d => d.Tipo === "Capacitación"));
   renderDocs("tab-certificaciones", docsOp.filter(d => d.Tipo === "Certificación"));
-  renderMedico("tab-medico", medicoOp);
-
   cambiarTab(0);
 
   document.getElementById("pantalla-pin").style.display    = "none";
@@ -864,8 +633,7 @@ function renderDocs(contenedorId, docs) {
   const el = document.getElementById(contenedorId);
   el.innerHTML = "";
   if (!docs || docs.length === 0) {
-    el.innerHTML = '<p class="sin-datos">Sin documentos registrados</p>';
-    return;
+    el.innerHTML = '<p class="sin-datos">Sin documentos registrados</p>'; return;
   }
   docs.forEach(doc => {
     const estado     = doc.Estado || "";
@@ -888,40 +656,11 @@ function renderDocs(contenedorId, docs) {
   });
 }
 
-function renderMedico(contenedorId, docs) {
-  const el = document.getElementById(contenedorId);
-  el.innerHTML = "";
-  if (!docs || docs.length === 0) {
-    el.innerHTML = '<p class="sin-datos">Sin exámenes registrados</p>';
-    return;
-  }
-  docs.forEach(doc => {
-    const estado     = doc.Estado || "";
-    const badgeClass = "badge-" + estado.replace(/ /g, "-");
-    const pdfURL     = doc.PDF ? drivePreview(doc.PDF) : "";
-    const div        = document.createElement("div");
-    div.className    = "doc-item";
-    div.innerHTML    = `
-      <div class="doc-info">
-        <div class="doc-tipo">Examen Médico</div>
-        <div class="doc-nombre">${doc.Nombre || ""}</div>
-        <div class="doc-fecha">Vence: ${doc.FechaVencimiento || "—"}</div>
-      </div>
-      <div class="doc-derecha">
-        ${estado ? `<span class="badge ${badgeClass}">${estado}</span>` : ""}
-        ${pdfURL ? `<button class="btn-pdf" onclick="abrirPDF('${pdfURL}','${doc.Nombre}')">Ver PDF</button>` : ""}
-      </div>
-    `;
-    el.appendChild(div);
-  });
-}
-
 function drivePreview(url) {
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (match) return `https://drive.google.com/file/d/${match[1]}/preview?rm=minimal&embedded=true`;
   return url;
 }
-
 function tiempoDesde(f) {
   if (!f) return "—";
   const parts = f.split("/");
@@ -929,31 +668,27 @@ function tiempoDesde(f) {
   const [d, m, y] = parts.map(Number);
   const desde = new Date(y, m - 1, d);
   const hoy   = new Date();
-  let a  = hoy.getFullYear() - desde.getFullYear();
-  let ms = hoy.getMonth()    - desde.getMonth();
+  let a = hoy.getFullYear() - desde.getFullYear();
+  let ms = hoy.getMonth() - desde.getMonth();
   if (ms < 0) { a--; ms += 12; }
-  if (a > 0 && ms > 0) return `${a} año${a > 1 ? "s" : ""} ${ms} mes${ms > 1 ? "es" : ""}`;
-  if (a > 0) return `${a} año${a > 1 ? "s" : ""}`;
-  return `${ms} mes${ms > 1 ? "es" : ""}`;
+  if (a > 0 && ms > 0) return `${a} año${a>1?"s":""} ${ms} mes${ms>1?"es":""}`;
+  if (a > 0) return `${a} año${a>1?"s":""}`;
+  return `${ms} mes${ms>1?"es":""}`;
 }
-
 function cambiarTab(idx) {
-  document.querySelectorAll(".tab").forEach((t, i)         => t.classList.toggle("activa", i === idx));
-  document.querySelectorAll(".tab-content").forEach((c, i) => c.classList.toggle("activa", i === idx));
+  document.querySelectorAll(".tab").forEach((t,i)         => t.classList.toggle("activa", i===idx));
+  document.querySelectorAll(".tab-content").forEach((c,i) => c.classList.toggle("activa", i===idx));
 }
-
 function abrirPDF(url, titulo) {
   document.getElementById("visor-titulo").textContent = titulo;
   document.getElementById("iframe-pdf").src           = url;
   document.getElementById("visor-pdf").style.display  = "flex";
   history.pushState({ pantalla: "pdf" }, "");
 }
-
 function cerrarPDF() {
   document.getElementById("visor-pdf").style.display = "none";
   document.getElementById("iframe-pdf").src          = "";
 }
-
 function cerrarSesion() { location.reload(); }
 
 cargarDatos();
