@@ -328,10 +328,7 @@ body { font-family: Arial, sans-serif; background: #202b3d; min-height: 100vh; }
 </div>
 
 <script>
-const SHEETS_ID   = "1FoN-S-KOjs1vRuekQktGnX17_2pduM9ZjhDG3g8t5ZM";
-const PIN_MAESTRO = "0000";
-const PIN_SUPER   = "2002";
-const PIN_ALEX    = "1008";
+const PERFIL_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJ8mc3CmydYBrvfsH_TFxD7w8QBl80VUk1kEp0tzd_E7OYMfXeEPkKm21P8t2UreE/exec";
 const DNI_ALEX    = "75073340";
 const ROMBO_PARE  = "https://raw.githubusercontent.com/Alexander-art-moises/operadores_app/main/ROMBO_PARE_SUPER.png";
 const REPORTE360_URL = "https://reporte360.vercel.app";
@@ -343,13 +340,10 @@ let certsRequeridos    = [];
 let dniPerfilPendiente = null;
 let dniActual          = null;   // DNI del perfil que se está viendo
 
-function sheetURL(hoja) {
-  return `https://docs.google.com/spreadsheets/d/${SHEETS_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(hoja)}`;
-}
-async function fetchCSV(hoja) {
-  const res  = await fetch(sheetURL(hoja));
-  const text = await res.text();
-  return parseCSV(text);
+async function fetchData(accion) {
+  const res  = await fetch(PERFIL_SCRIPT_URL + "?accion=" + accion);
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
 }
 function parseCSV(text) {
   const lines   = text.trim().split("\n");
@@ -378,10 +372,10 @@ const dniLimpio = (d) => String(parseInt(d || "0"));
 async function cargarDatos() {
   try {
     [colaboradores, riesgos, documentos, certsRequeridos] = await Promise.all([
-      fetchCSV("1_Colaboradores"),
-      fetchCSV("2_Riesgos"),
-      fetchCSV("3_Documentos"),
-      fetchCSV("5_Certificados_Requeridos"),
+      fetchData("getColaboradores"),
+      fetchData("getRiesgos"),
+      fetchData("getDocumentos"),
+      fetchData("getCertificados"),
     ]);
     document.getElementById("pantalla-carga").style.display = "none";
     document.getElementById("pantalla-pin").style.display   = "flex";
@@ -447,24 +441,36 @@ function certificadosFaltantes(dni) {
 function tienePare(dni) { return certificadosFaltantes(dni).length > 0; }
 
 /* ══ PIN ══ */
-function verificarPin() {
+async function verificarPin() {
   const pin   = document.getElementById("input-pin").value.trim();
   const error = document.getElementById("pin-error");
   error.style.display = "none";
 
-  if (pin === PIN_MAESTRO) { mostrarLista(); return; }
-  if (pin === PIN_ALEX)    { mostrarPerfil(DNI_ALEX); return; }
-  if (pin === PIN_SUPER)   { mostrarLista(true); return; }
+  try {
+    const res  = await fetch(PERFIL_SCRIPT_URL + "?accion=verificarPin&pin=" + encodeURIComponent(pin));
+    const data = await res.json();
 
-  const op = colaboradores.find(c => {
-    const dni = dniLimpio(c.DNI);
-    return dni.startsWith(pin) && pin.length === 4 && dni !== DNI_ALEX;
-  });
-  if (op) { mostrarPerfil(dniLimpio(op.DNI)); return; }
-  const e = document.getElementById("pin-error");
-  e.textContent = "PIN incorrecto. Intenta nuevamente.";
-  e.style.display = "block";
-  document.getElementById("input-pin").value = "";
+    if (!data.ok) {
+      error.textContent = "PIN incorrecto. Intenta nuevamente.";
+      error.style.display = "block";
+      document.getElementById("input-pin").value = "";
+      return;
+    }
+
+    const op = data.usuario;
+    if (data.esSuper) {
+      if (op.DNI === DNI_ALEX || op.Nombre === "ADMINISTRADOR") {
+        mostrarLista();
+      } else {
+        mostrarLista(true);
+      }
+    } else {
+      mostrarPerfil(dniLimpio(op.DNI));
+    }
+  } catch(e) {
+    error.textContent = "Error de conexión. Intenta nuevamente.";
+    error.style.display = "block";
+  }
 }
 
 /* ══ LISTA ══ */
