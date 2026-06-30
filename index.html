@@ -345,28 +345,6 @@ async function fetchData(accion) {
   const data = await res.json();
   return Array.isArray(data) ? data : [];
 }
-function parseCSV(text) {
-  const lines   = text.trim().split("\n");
-  const headers = parseLine(lines[0]);
-  return lines.slice(1).map(line => {
-    const vals = parseLine(line);
-    const obj  = {};
-    headers.forEach((h, i) => obj[h.trim().replace(/"/g,"")] = (vals[i] || "").trim().replace(/"/g,""));
-    return obj;
-  });
-}
-function parseLine(line) {
-  const result = [];
-  let cur = "", inQ = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"') { inQ = !inQ; }
-    else if (c === ',' && !inQ) { result.push(cur); cur = ""; }
-    else { cur += c; }
-  }
-  result.push(cur);
-  return result;
-}
 const dniLimpio = (d) => String(parseInt(d || "0"));
 
 async function cargarDatos() {
